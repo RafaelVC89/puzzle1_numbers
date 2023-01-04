@@ -1,6 +1,11 @@
 #include <iostream>
+#include <chrono>
+#include "solution.cpp"
 
 using namespace std;
+using namespace std::chrono;
+
+extern void solve(char puzzle[3][3]);
 
 char PUZZLE[3][3] = 
     {1, 2, 3,
@@ -66,11 +71,17 @@ int main()
     srand(4);
     int row = 2;
     int column = 2;
-    printPuzzle();
     for (int i = 0; i < 1000; ++i)
     {
         makeRandomMovement(row, column);
     }
+    cout << "Puzzle to solve: " << endl;
     printPuzzle();
+    auto start = steady_clock::now();
+    solve(PUZZLE);
+    auto end = steady_clock::now();
+    cout << "Puzzle after solution: " << endl;
+    printPuzzle();
+    cout << "Solution took " << duration_cast<milliseconds>(end - start).count() << " milliseconds." << endl;
     return 0;
 }
