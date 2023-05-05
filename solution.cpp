@@ -177,8 +177,10 @@ void solve(char puzzle[3][3])
 
     direction_enum previousMovement = NONE;
     bool solutionFound = false;
+    int statesAnalyzed = 0;
     while(!solutionFound && !statesStack.empty())
     {
+        statesAnalyzed++;
         State currentState = statesStack.pop();
         previousMovement = currentState.previousMovement;
         if (solved(currentState.puzzle))
@@ -233,5 +235,5 @@ void solve(char puzzle[3][3])
             makeMovement(currentState, UP);
         }
     }
-    cout << "Solution found!" << endl;
+    cout << "Solution found! " << statesAnalyzed << " states were analyzed." << endl << endl;
 }
