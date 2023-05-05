@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unordered_set>
 
 using namespace std;
 
@@ -40,8 +41,6 @@ private:
     int mSize;
 };
 
-bool VISITED[9][9][9][9][9][9][9][9][9] = {};
-
 void printCurrentPuzzle(char puzzle[3][3])
 {
     for (int row = 0; row < 3; ++row)
@@ -76,46 +75,21 @@ bool solved(char puzzle[3][3])
     return puzzle[0][0] == 1 && puzzle[0][1] == 2 && puzzle[0][2] == 3 && puzzle[1][0] == 4 && puzzle[1][1] == 5 && puzzle[1][2] == 6 && puzzle[2][0] == 7 && puzzle[2][1] == 8 && puzzle[2][2] == 0;
 }
 
-void clearVisited()
+int getIdentifier(char puzzle[3][3])
 {
-    for(int i1 = 0; i1 < 9; ++i1)
-    {
-        for(int i2 = 0; i2 < 9; ++i2)
-        {
-            for(int i3 = 0; i3 < 9; ++i3)
-            {
-                for(int i4 = 0; i4 < 9; ++i4)
-                {
-                    for(int i5 = 0; i5 < 9; ++i5)
-                    {
-                        for(int i6 = 0; i6 < 9; ++i6)
-                        {
-                            for(int i7 = 0; i7 < 9; ++i7)
-                            {
-                                for(int i8 = 0; i8 < 9; ++i8)
-                                {
-                                    for(int i9 = 0; i9 < 9; ++i9)
-                                    {
-                                        VISITED[i1][i2][i3][i4][i5][i6][i7][i8][i9] = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    return (puzzle[0][0] * 100000000) + (puzzle[0][1] * 10000000) + (puzzle[0][2] * 1000000) + (puzzle[1][0] * 100000) + (puzzle[1][1] * 10000) + (puzzle[1][2] * 1000) + (puzzle[2][0] * 100) + (puzzle[2][1] * 10) + puzzle[2][2];
 }
 
-bool visited(char puzzle[3][3])
+bool visited(unordered_set<int> &visitedSet, char puzzle[3][3])
 {
-    return VISITED[puzzle[0][0]][puzzle[0][1]][puzzle[0][2]][puzzle[1][0]][puzzle[1][1]][puzzle[1][2]][puzzle[2][0]][puzzle[2][1]][puzzle[2][2]];
+    int puzzleIdentifier = getIdentifier(puzzle);
+    return visitedSet.count(puzzleIdentifier) == 1;
 }
 
-void mark_visit(char puzzle[3][3])
+void mark_visit(unordered_set<int> &visitedSet, char puzzle[3][3])
 {
-    VISITED[puzzle[0][0]][puzzle[0][1]][puzzle[0][2]][puzzle[1][0]][puzzle[1][1]][puzzle[1][2]][puzzle[2][0]][puzzle[2][1]][puzzle[2][2]] = true;
+    int puzzleIdentifier = getIdentifier(puzzle);
+    visitedSet.insert(puzzleIdentifier);
 }
 
 void makeMovement(State& state, direction_enum direction)
@@ -164,8 +138,7 @@ void copyPuzzle(char toPuzzle[3][3], char puzzle[3][3])
 void solve(char puzzle[3][3])
 {
     cout << "Solution starting." << endl;
-    
-    clearVisited();
+    unordered_set<int> visitedSet;
 
     State newState;
     newState.previousMovement = NONE;
@@ -194,10 +167,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != RIGHT && currentState.emptyCol > 0)
         {
             makeMovement(currentState, LEFT);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, RIGHT);
         }
@@ -205,10 +178,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != DOWN && currentState.emptyRow > 0)
         {
             makeMovement(currentState, UP);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, DOWN);
         }
@@ -216,10 +189,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != LEFT && currentState.emptyCol < 2)
         {
             makeMovement(currentState, RIGHT);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, LEFT);
         }
@@ -227,10 +200,10 @@ void solve(char puzzle[3][3])
         if (previousMovement != UP && currentState.emptyRow < 2)
         {
             makeMovement(currentState, DOWN);
-            if (!visited(currentState.puzzle))
+            if (!visited(visitedSet, currentState.puzzle))
             {
                 statesStack.push(currentState);
-                mark_visit(currentState.puzzle);
+                mark_visit(visitedSet, currentState.puzzle);
             }
             makeMovement(currentState, UP);
         }
