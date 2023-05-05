@@ -68,7 +68,7 @@ void makeRandomMovement(int &row, int &column)
 int main()
 {
     //Initialize random seed with a static value to get the same random number each time
-    srand(4);
+    srand(5);
     int row = 2;
     int column = 2;
     for (int i = 0; i < 1000; ++i)
